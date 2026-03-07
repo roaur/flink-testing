@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  # 1. Scrape Flink JobManager Metrics
+  - job_name: 'flink_jobmanager'
+    static_configs:
+      - targets: ['jobmanager:9249']
+
+  # 2. Scrape Flink TaskManager Metrics
+  - job_name: 'flink_taskmanager'
+    static_configs:
+      - targets: ['taskmanager:9249']
+
+  # 3. Scrape Debezium JMX Producer/Consumer Metrics
+  - job_name: 'debezium_connect'
+    static_configs:
+      - targets: ['connect:8090']
+
+  # 4. Scrape Redpanda Broker Metrics (Built-in Endpoint)
+  - job_name: 'redpanda'
+    static_configs:
+      - targets: ['redpanda:9644']
+
+  # 5. Scrape Postgres Exporter (WAL Monitoring)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']

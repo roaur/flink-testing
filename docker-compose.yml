@@ -1,0 +1,200 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpassword
+      POSTGRES_DB: iotdb
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pguser -d iotdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.2.19
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '0'
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    healthcheck:
+      test: [ "CMD-SHELL", "rpk cluster health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.3.1
+    container_name: redpanda-console
+    environment:
+      KAFKA_BROKERS: redpanda:29092
+    ports:
+      - "8085:8080"
+    depends_on:
+      - redpanda
+
+  connect:
+    build:
+      context: ./postgres
+    container_name: connect
+    environment:
+      BOOTSTRAP_SERVERS: redpanda:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+      - "8090:8090"
+
+  jobmanager:
+    build:
+      context: ./flink
+    container_name: jobmanager
+    ports:
+      - "8081:8081"
+      - "9249:9249"
+    command: jobmanager
+    volumes:
+      - ./flink-jobs:/opt/flink/flink-jobs
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+
+  taskmanager:
+    build:
+      context: ./flink
+    container_name: taskmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    scale: 1
+    ports:
+      - "9250:9249"
+    volumes:
+      - ./flink-jobs:/opt/flink/flink-jobs
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 10
+
+  flink-job-submitter:
+    build:
+      context: ./flink
+    container_name: flink-job-submitter
+    depends_on:
+      - jobmanager
+      - taskmanager
+    command: bash -c "sleep 15 && /opt/flink/bin/sql-client.sh -f /opt/flink/flink-jobs/job.sql"
+    volumes:
+      - ./flink-jobs:/opt/flink/flink-jobs
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.address: jobmanager
+
+  debezium-initializer:
+    image: curlimages/curl
+    container_name: debezium-initializer
+    depends_on:
+      - connect
+    volumes:
+      - ./postgres/debezium_connector.json:/debezium_connector.json
+    command: >
+      sh -c "
+        while ! curl -s -o /dev/null -w '%{http_code}' http://connect:8083/connectors/ | grep -q 200; do
+          echo 'Waiting for Kafka Connect REST API...';
+          sleep 5;
+        done;
+        echo 'Kafka Connect API ready. Registering Debezium connector...';
+        curl -i -X POST -H 'Accept:application/json' -H 'Content-Type:application/json' http://connect:8083/connectors/ -d @/debezium_connector.json
+      "
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://pguser:pgpassword@postgres:5432/iotdb?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    depends_on:
+      - jobmanager
+      - taskmanager
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/ready" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:10.1.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    container_name: producer
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpassword
+      POSTGRES_DB: iotdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  prometheus_data:

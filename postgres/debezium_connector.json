@@ -1,0 +1,28 @@
+{
+    "name": "raw-metrics-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "plugin.name": "pgoutput",
+        "database.hostname": "postgres",
+        "database.port": "5432",
+        "database.user": "pguser",
+        "database.password": "pgpassword",
+        "database.dbname": "iotdb",
+        "database.server.name": "postgres_server",
+        "table.include.list": "public.raw_metrics",
+        "topic.prefix": "postgres",
+        "decimal.handling.mode": "double",
+        "slot.name": "flink_debezium_slot",
+        "publication.name": "dbz_publication",
+        "publication.autocreate.mode": "disabled",
+        "tombstones.on.delete": "false",
+        "transforms": "unwrap",
+        "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+        "transforms.unwrap.drop.tombstones": "true",
+        "producer.override.compression.type": "lz4",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false"
+    }
+}
