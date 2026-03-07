@@ -13,10 +13,10 @@ DB_NAME = os.getenv("POSTGRES_DB", "iotdb")
 
 # Simulation config
 NUM_JOBS = 50
-CHANNELS_PER_JOB = 500
+CHANNELS_PER_JOB = 1000
 TOTAL_CHANNELS = NUM_JOBS * CHANNELS_PER_JOB
-# To achieve ~3000 records/sec total, we need each channel to emit 1 record per second
-# (10 jobs * 300 channels/job * 1 record/sec = 3000 records/sec)
+# To achieve ~50000 records/sec total, we need each channel to emit 1 record per second
+# (50 jobs * 1000 channels/job * 1 record/sec = 50000 records/sec)
 
 async def worker(pool, job_id, channels):
     """
@@ -43,16 +43,20 @@ async def worker(pool, job_id, channels):
 
             records.append((current_timestamp, job_id, channel_id, values[channel_id]))
 
+        gen_time = time.time()
+
         # Bulk insert the batch
-        query = """
-        INSERT INTO public.raw_metrics (timestamp_ms, job_id, channel_id, value)
-        VALUES ($1, $2, $3, $4)
-        """
         try:
             async with pool.acquire() as conn:
-                await conn.executemany(query, records)
+                await conn.copy_records_to_table(
+                    "raw_metrics",
+                    records=records,
+                    columns=["timestamp_ms", "job_id", "channel_id", "value"]
+                )
         except Exception as e:
             print(f"[{job_id}] Database Error: {e}")
+
+        insert_time = time.time()
 
         # Sleep for exactly whatever is remaining of the 1-second interval
         elapsed = time.time() - start_time
@@ -60,7 +64,7 @@ async def worker(pool, job_id, channels):
 
         # If we exceeded 1 second to write, log a warning
         if elapsed > 1.0:
-            print(f"[{job_id}] Warning: Batch took {elapsed:.3f}s, exceeding 1s target.")
+            print(f"[{job_id}] Warning: Batch took {elapsed:.3f}s (Gen: {gen_time - start_time:.3f}s, DB: {insert_time - gen_time:.3f}s), exceeding 1s target.")
 
         await asyncio.sleep(sleep_time)
 
