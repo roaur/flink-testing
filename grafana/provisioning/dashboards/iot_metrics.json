@@ -105,12 +105,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
-                    "expr": "flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{job_name=\"insert_into_default_catalog_default_database_enriched_metrics_sink\"}",
+                    "editorMode": "code",
+                    "expr": "flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "{{instance}} p{{partition}}",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -203,12 +203,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
-                    "expr": "rate(flink_taskmanager_job_task_operator_KafkaProducer_record_send_total{job_name=\"insert_into_default_catalog_default_database_enriched_metrics_sink\"}[1m])",
+                    "editorMode": "code",
+                    "expr": "rate(flink_taskmanager_job_task_operator_KafkaProducer_record_send_total[1m])",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "{{instance}}",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -301,12 +301,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
+                    "editorMode": "code",
                     "expr": "rate(kafka_producer_producer_topic_metrics_record_send_total{topic=\"postgres.public.raw_metrics\"}[1m])",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "{{client_id}}",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -399,12 +399,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
+                    "editorMode": "code",
                     "expr": "rate(debezium_postgres_connector_metrics_totalnumberofeventsseen{context=\"streaming\"}[1m])",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "Debezium events/min",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -497,12 +497,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
+                    "editorMode": "code",
                     "expr": "rate(pg_stat_database_tup_inserted{datname=\"iotdb\"}[1m])",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "Postgres inserts/min",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -694,12 +694,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
-                    "expr": "rate(kafka_producer_producer_metrics_record_send_total{instance=\"connect:8090\"}[1m])",
+                    "editorMode": "code",
+                    "expr": "rate(kafka_producer_producer_metrics_record_send_total{instance=\"connect:8090\", client_id=\"connector-producer-raw-metrics-connector-0\"}[1m])",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "Debezium produced/min",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -792,12 +792,12 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "builder",
-                    "expr": "rate(flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name=\"insert_into_default_catalog_default_database_enriched_metrics_sink\"}[1m])",
+                    "editorMode": "code",
+                    "expr": "rate(flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total[1m])",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
-                    "instant": true,
-                    "legendFormat": "__auto",
+                    "instant": false,
+                    "legendFormat": "{{instance}} p{{partition}}",
                     "range": true,
                     "refId": "A",
                     "useBackend": false
@@ -822,6 +822,6 @@
     "timezone": "",
     "title": "IoT Metrics Dashboard",
     "uid": "a83bb763-7ff1-4ab1-a5ba-fb2a6e02996a",
-    "version": 13,
+    "version": 15,
     "weekStart": ""
 }
