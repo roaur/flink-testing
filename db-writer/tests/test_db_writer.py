@@ -1,7 +1,7 @@
 import pytest
 import time
 from unittest.mock import AsyncMock, MagicMock
-from producer import worker
+from db_writer import worker
 
 @pytest.mark.asyncio
 async def test_worker_generates_correct_data_structure():

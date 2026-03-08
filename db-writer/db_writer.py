@@ -12,8 +12,8 @@ DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "iotdb")
 
 # Simulation config
-NUM_JOBS = 50
-CHANNELS_PER_JOB = 1000
+NUM_JOBS = int(os.getenv("NUM_JOBS", "50"))
+CHANNELS_PER_JOB = int(os.getenv("CHANNELS_PER_JOB", "1000"))
 TOTAL_CHANNELS = NUM_JOBS * CHANNELS_PER_JOB
 # To achieve ~50000 records/sec total, we need each channel to emit 1 record per second
 # (50 jobs * 1000 channels/job * 1 record/sec = 50000 records/sec)

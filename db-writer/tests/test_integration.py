@@ -22,7 +22,7 @@ def test_end_to_end_flink_pipeline():
         pg_count = cursor.fetchone()[0]
 
         if pg_count == 0:
-            print("No records found in Postgres! Ensure producer.py is running.")
+            print("No records found in Postgres! Ensure db_writer.py is running.")
             return
 
         # 2. Setup Kafka Consumer to read from 'enriched_metrics' Redpanda topic

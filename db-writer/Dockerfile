@@ -10,10 +10,10 @@ ENV PYTHONUNBUFFERED=1
 
 # Copy dependency configuration and install using uv into the system
 COPY pyproject.toml .
-RUN uv pip install --system asyncpg
+RUN uv pip install --system asyncpg confluent-kafka psycopg2-binary
 
-# Copy the producer execution script
-COPY producer.py .
+# Copy the db-writer execution script and other context files
+COPY . .
 
 # Run the data generator
-CMD ["python", "producer.py"]
+CMD ["python", "db_writer.py"]

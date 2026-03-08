@@ -50,6 +50,8 @@ services:
     command:
       - redpanda
       - start
+      - --set
+      - redpanda.default_topic_partitions=4
       - --smp
       - '1'
       - --reserve-memory
@@ -84,9 +86,12 @@ services:
     build:
       context: ./postgres
     container_name: connect
+    cpus: "2"
+    mem_limit: 4g
     environment:
       BOOTSTRAP_SERVERS: redpanda:29092
       GROUP_ID: 1
+      KAFKA_HEAP_OPTS: "-Xms2g -Xmx2g"
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
       STATUS_STORAGE_TOPIC: my_connect_statuses
@@ -103,6 +108,8 @@ services:
     build:
       context: ./flink
     container_name: jobmanager
+    cpus: "2"
+    mem_limit: 2g
     ports:
       - "8081:8081"
       - "9249:9249"
@@ -122,11 +129,12 @@ services:
       - jobmanager
     command: taskmanager
     scale: 1
+    cpus: "4"
     ports:
       - "9250:9249"
     volumes:
       - ./flink-jobs:/opt/flink/flink-jobs
-    mem_limit: 9g
+    mem_limit: 8g
     environment:
       - |
         FLINK_PROPERTIES=
@@ -182,6 +190,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
     ports:
       - "9090:9090"
     volumes:
@@ -208,11 +217,12 @@ services:
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
 
-  producer:
+  db-writer:
     build:
-      context: .
-      dockerfile: producer/Dockerfile
-    container_name: producer
+      context: ./db-writer
+    container_name: db-writer
+    env_file:
+      - .env
     environment:
       POSTGRES_HOST: pgbouncer
       POSTGRES_PORT: 6432
