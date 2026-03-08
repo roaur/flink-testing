@@ -52,10 +52,14 @@ services:
       - start
       - --set
       - redpanda.default_topic_partitions=4
+      - --set
+      - write_caching_default=true
+      - --set
+      - raft_replica_max_flush_delay_ms=500 # Flush every 500ms
       - --smp
       - '1'
       - --reserve-memory
-      - 0M
+      - 1000M
       - --overprovisioned
       - --node-id
       - '0'
