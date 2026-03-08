@@ -3,23 +3,19 @@
     "packages": {
         "db-writer": {
             "release-type": "simple",
-            "package-name": "db-writer",
-            "changelog-path": "db-writer/CHANGELOG.md"
+            "package-name": "db-writer"
         },
         "flink": {
             "release-type": "simple",
-            "package-name": "flink",
-            "changelog-path": "flink/CHANGELOG.md"
+            "package-name": "flink"
         },
         "postgres": {
             "release-type": "simple",
-            "package-name": "postgres",
-            "changelog-path": "postgres/CHANGELOG.md"
+            "package-name": "postgres"
         },
         "flink-jobs": {
             "release-type": "simple",
-            "package-name": "flink-jobs",
-            "changelog-path": "flink-jobs/CHANGELOG.md"
+            "package-name": "flink-jobs"
         }
     },
     "plugins": [
