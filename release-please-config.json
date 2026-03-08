@@ -1,0 +1,37 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "packages": {
+        "db-writer": {
+            "release-type": "simple",
+            "package-name": "db-writer",
+            "changelog-path": "db-writer/CHANGELOG.md"
+        },
+        "flink": {
+            "release-type": "simple",
+            "package-name": "flink",
+            "changelog-path": "flink/CHANGELOG.md"
+        },
+        "postgres": {
+            "release-type": "simple",
+            "package-name": "postgres",
+            "changelog-path": "postgres/CHANGELOG.md"
+        },
+        "flink-jobs": {
+            "release-type": "simple",
+            "package-name": "flink-jobs",
+            "changelog-path": "flink-jobs/CHANGELOG.md"
+        }
+    },
+    "plugins": [
+        {
+            "type": "linked-versions",
+            "groupName": "flink-testing-suite",
+            "components": [
+                "db-writer",
+                "flink",
+                "postgres",
+                "flink-jobs"
+            ]
+        }
+    ]
+}

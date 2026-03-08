@@ -1,0 +1,6 @@
+{
+    "db-writer": "0.1.0",
+    "flink": "0.1.0",
+    "postgres": "0.1.0",
+    "flink-jobs": "0.1.0"
+}
