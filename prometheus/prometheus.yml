@@ -1,5 +1,6 @@
 global:
   scrape_interval: 5s
+  scrape_timeout: 4s
 
 scrape_configs:
   # 1. Scrape Flink JobManager Metrics
@@ -7,8 +8,10 @@ scrape_configs:
     static_configs:
       - targets: ['jobmanager:9249']
 
-  # 2. Scrape Flink TaskManager Metrics
+  # 2. Scrape Flink TaskManager Metrics — longer timeout since it can be slow under load
   - job_name: 'flink_taskmanager'
+    scrape_interval: 10s
+    scrape_timeout: 9s
     static_configs:
       - targets: ['taskmanager:9249']
 

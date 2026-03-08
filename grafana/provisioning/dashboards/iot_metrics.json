@@ -203,8 +203,8 @@
                         "uid": "PBFA97CFB590B2093"
                     },
                     "disableTextWrap": false,
-                    "editorMode": "code",
-                    "expr": "rate(flink_taskmanager_job_task_operator_KafkaProducer_record_send_total[1m])",
+                    "editorMode": "builder",
+                    "expr": "sum by(host) (rate(flink_taskmanager_job_task_operator_KafkaProducer_record_send_total[1m]))",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
                     "instant": false,
@@ -212,6 +212,17 @@
                     "range": true,
                     "refId": "A",
                     "useBackend": false
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "PBFA97CFB590B2093"
+                    },
+                    "expr": "",
+                    "hide": false,
+                    "instant": false,
+                    "range": true,
+                    "refId": "B"
                 }
             ],
             "title": "Flink: Records Written to Enriched Data Topic per Minute",
@@ -557,8 +568,7 @@
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green",
-                                "value": null
+                                "color": "green"
                             },
                             {
                                 "color": "red",
@@ -656,8 +666,7 @@
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green",
-                                "value": null
+                                "color": "green"
                             },
                             {
                                 "color": "red",
@@ -754,8 +763,7 @@
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green",
-                                "value": null
+                                "color": "green"
                             },
                             {
                                 "color": "red",
@@ -807,7 +815,7 @@
             "type": "timeseries"
         }
     ],
-    "refresh": "",
+    "refresh": false,
     "schemaVersion": 38,
     "style": "dark",
     "tags": [],
@@ -822,6 +830,6 @@
     "timezone": "",
     "title": "IoT Metrics Dashboard",
     "uid": "a83bb763-7ff1-4ab1-a5ba-fb2a6e02996a",
-    "version": 15,
+    "version": 1,
     "weekStart": ""
 }
