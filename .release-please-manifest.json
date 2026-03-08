@@ -1,6 +1,6 @@
 {
-    "db-writer": "0.1.0",
-    "flink": "0.1.0",
-    "postgres": "0.1.0",
-    "flink-jobs": "0.1.0"
+    "db-writer": "0.2.0",
+    "flink": "0.2.0",
+    "postgres": "0.2.0",
+    "flink-jobs": "0.2.0"
 }
